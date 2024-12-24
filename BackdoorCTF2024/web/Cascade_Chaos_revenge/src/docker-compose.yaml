@@ -1,0 +1,28 @@
+services:
+  local:
+    build:
+      context: ./local_service
+      dockerfile: Dockerfile
+    volumes:
+      - ./local_service:/app
+      - puppeteer-cache:/home/node/.cache/puppeteer
+    ports:
+      - "4002:4002"
+    env_file:
+      - .env
+
+  remotehost:
+    build:
+      context: ./remote_service
+      dockerfile: Dockerfile
+    volumes:
+      - ./remote_service:/app
+      - /app/node_modules
+      - puppeteer-cache:/home/node/.cache/puppeteer
+    ports:
+      - "4001:4001"
+    env_file:
+      - .env
+
+volumes:
+  puppeteer-cache:

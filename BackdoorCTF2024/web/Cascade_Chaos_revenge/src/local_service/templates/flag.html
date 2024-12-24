@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flag</title>
+    <style>
+        :root {
+        --flag-color: {{ color|safe }};
+        }
+        body{
+            overflow-y:hidden;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        body{
+            background-color: var(--flag-color);
+        }
+    </style>
+</head>
+<body>
+    <h3>Flag:</h3>
+    <div class="flag"></div>
+<script>
+    // Flag visibility restricted to direct access only for security reasons
+    if (window.name === "Flag") { 
+        const flagContainer = document.querySelector(".flag");    
+        const flagChars = "{{ flag }}".split("");
+        // Breaking the flag into pieces, because fragmented flags are harder to steal... right?
+        flagChars.forEach(char => {
+            const span = document.createElement("span");
+            span.textContent = char; 
+            flagContainer.appendChild(span);
+        });
+    }
+</script>    
+</body>
+</html>
